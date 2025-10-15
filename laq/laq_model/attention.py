@@ -169,7 +169,9 @@ class Attention(nn.Module):
         if self.causal:
             sim = sim + self.rel_pos_bias(sim)
 
-            causal_mask = torch.ones((i, j), device = device, dtype = torch.bool).triu(j - i + 1)
+            causal_mask = torch.ones((i, j),
+                        device = device,
+                        dtype = torch.bool).triu(j - i + 1)
             sim = sim.masked_fill(causal_mask, -torch.finfo(sim.dtype).max)
 
         attn = sim.softmax(dim = -1)
