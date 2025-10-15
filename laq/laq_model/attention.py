@@ -196,7 +196,8 @@ class AlibiPositionalBias(nn.Module):
     def get_bias(self, i, j, device):
         i_arange = torch.arange(j - i, j, device = device)
         j_arange = torch.arange(j, device = device)
-        bias = -torch.abs(rearrange(j_arange, 'j -> 1 1 j') - rearrange(i_arange, 'i -> 1 i 1'))
+        bias = -torch.abs(
+            rearrange(j_arange, 'j -> 1 1 j') - rearrange(i_arange, 'i -> 1 i 1'))
         return bias
 
     @staticmethod
@@ -261,7 +262,8 @@ class ContinuousPositionBias(nn.Module):
             positions = [torch.arange(d, device = device) for d in dimensions]
             grid = torch.stack(torch.meshgrid(*positions, indexing = 'ij'))
             grid = rearrange(grid, 'c ... -> (...) c')
-            rel_pos = rearrange(grid, 'i c -> i 1 c') - rearrange(grid, 'j c -> 1 j c')
+            rel_pos = rearrange(grid, 'i c -> i 1 c') 
+                        - rearrange(grid, 'j c -> 1 j c')
 
             if self.log_dist:
                 rel_pos = torch.sign(rel_pos) * torch.log(rel_pos.abs() + 1)
@@ -301,8 +303,20 @@ class Transformer(nn.Module):
         for _ in range(depth):
             self.layers.append(nn.ModuleList([
                 PEG(dim = dim, causal = peg_causal) if peg else None,
-                Attention(dim = dim, dim_head = dim_head, heads = heads, causal = causal, dropout = attn_dropout),
-                Attention(dim = dim, dim_head = dim_head, dim_context = dim_context, heads = heads, causal = False, num_null_kv = attn_num_null_kv, dropout = attn_dropout) if has_cross_attn else None,
+                Attention(
+                    dim = dim,
+                    dim_head = dim_head,
+                    heads = heads,
+                    causal = causal,
+                    dropout = attn_dropout),
+                Attention(
+                    dim = dim,
+                    dim_head = dim_head,
+                    dim_context = dim_context,
+                    heads = heads,
+                    causal = False,
+                    num_null_kv = attn_num_null_kv, dropout = attn_dropout)
+                    if has_cross_attn else None,
                 FeedForward(dim = dim, mult = ff_mult, dropout = ff_dropout)
             ]))
 
