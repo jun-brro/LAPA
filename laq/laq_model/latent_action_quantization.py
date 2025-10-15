@@ -55,7 +55,9 @@ class LatentActionQuantization(nn.Module):
         self.patch_size = pair(patch_size)
         patch_height, patch_width = self.patch_size
 
-        self.spatial_rel_pos_bias = ContinuousPositionBias(dim = dim, heads = heads)
+        self.spatial_rel_pos_bias = ContinuousPositionBias(
+                                    dim = dim,
+                                    heads = heads)
 
         image_height, image_width = self.image_size
         assert (image_height % patch_height) == 0 and (image_width % patch_width) == 0
